@@ -1,0 +1,201 @@
+{
+  "format": 1,
+  "id": "bench",
+  "status": "completed",
+  "command": "magnitude-bench job --inference /home/outsmartchad/.cache/magnitude-evaluation/outputs/d5bb3a407c23d17f-0bd87f38c1ce149e/src --model glm-5.3-flash:gguf:iq2 --passes 2 --fresh-tuning --magnitude-device cuda --magnitude-binary /home/outsmartchad/.cache/magnitude-evaluation/outputs/d5bb3a407c23d17f-0bd87f38c1ce149e/target/release/magnitude-engine --magnitude-cache-dir /home/outsmartchad/.cache/magnitude-evaluation/runs/20261125T084019Z-bench-6bb9e2/kernels --harness /home/outsmartchad/.cache/magnitude-evaluation/outputs/d5bb3a407c23d17f-0bd87f38c1ce149e/target/release/magnitude-render --template /home/outsmartchad/.cache/magnitude-evaluation/runs/20261125T084019Z-bench-6bb9e2/inputs/f67f31e10d8a2109.json --artifacts /home/outsmartchad/.cache/magnitude-evaluation/runs/20261125T084019Z-bench-6bb9e2/artifacts.json --output /home/outsmartchad/.cache/magnitude-evaluation/runs/20261125T084019Z-bench-6bb9e2/bench --build-identity /home/outsmartchad/.cache/magnitude-evaluation/runs/20261125T084019Z-bench-6bb9e2/bench/build.json",
+  "planned": 2,
+  "completed": 2,
+  "outcomes": {
+    "valid": 2
+  },
+  "rows": [
+    {
+      "target": "magnitude",
+      "section": "context",
+      "template": "repeat:64k",
+      "context_target": 65536,
+      "concurrency": 1,
+      "observations": 2,
+      "eligible": 2,
+      "outcomes": {
+        "valid": 2
+      },
+      "actual_prompt_tokens": [
+        64363
+      ],
+      "actual_completion_tokens": [
+        256
+      ],
+      "ttft_ms": 100591.62193798693,
+      "completion_ms": 118820.9111809847,
+      "ttft_p95_ms": 100893.2099629892,
+      "completion_p95_ms": 118835.73604898993,
+      "prefill_tokens_per_second": 641.5393311795757,
+      "decode_tokens_per_second": 14.0497782681195,
+      "draft_proposed": null,
+      "draft_accepted": null,
+      "timing_basis": "native-model-service"
+    }
+  ],
+  "error": null,
+  "comparison": "product comparison of each engine's serving of one catalog model",
+  "cache_policy": "disabled; shared session history does not imply retained prefix reuse",
+  "process_footprints": [
+    {
+      "baseline_rss_bytes": 102732451840,
+      "block": 0,
+      "peak_rss_bytes": 105543876608,
+      "target": "magnitude"
+    },
+    {
+      "baseline_rss_bytes": 103548432384,
+      "block": 1,
+      "peak_rss_bytes": 104300707840,
+      "target": "magnitude"
+    }
+  ],
+  "expert_banks": [
+    {
+      "target": "magnitude",
+      "label": "block-0",
+      "first_slots": 287,
+      "last_slots": 249,
+      "min_slots": 247,
+      "max_slots": 287,
+      "floor": 16,
+      "ceiling": 288,
+      "resizes": {
+        "experts": {
+          "Grew": 2
+        }
+      },
+      "latest_resize": {
+        "holding": "experts",
+        "kind": "Grew",
+        "from": 247,
+        "to": 249,
+        "at_unix_ms": 1795596740412
+      }
+    },
+    {
+      "target": "magnitude",
+      "label": "block-1",
+      "first_slots": 285,
+      "last_slots": 253,
+      "min_slots": 247,
+      "max_slots": 285,
+      "floor": 16,
+      "ceiling": 288,
+      "resizes": {
+        "experts": {
+          "Grew": 2
+        }
+      },
+      "latest_resize": {
+        "holding": "experts",
+        "kind": "Grew",
+        "from": 247,
+        "to": 253,
+        "at_unix_ms": 1795597194694
+      }
+    }
+  ],
+  "tuning_health": {
+    "work": "search",
+    "budget_seconds": 60.0,
+    "total_units": 130,
+    "qualified": 6,
+    "canonical_fallbacks": 124,
+    "fallback_rate": 0.9538461538461539,
+    "high_fallback": true,
+    "expired": 44,
+    "unqualified_budget": 39,
+    "refused": 89,
+    "total_default_gaps": 1,
+    "worst_default_gaps": [
+      {
+        "unit": "dense_expand [NW=bf16,GW=q5k@mma16,UW=q5k@mma16,A=bf16,function=0,M=65..]",
+        "entry": "dense_expand",
+        "bindings": "NW=bf16,GW=q5k@mma16,UW=q5k@mma16,A=bf16,function=0,M=65..",
+        "default_us": 498.85014858271524,
+        "best_us": 338.1388429538566,
+        "ratio": 1.4752820002131188,
+        "qualification": "qualified",
+        "stop": "Expired"
+      }
+    ],
+    "slowest_fallbacks": [
+      {
+        "unit": "attention_prefill [A=bf16,M=1..17;codec=CodecSpec { key: Dense { dtype: BF16 }, key_width: 512, value: Key, packing: 1 }]",
+        "entry": "attention_prefill",
+        "bindings": "A=bf16,M=1..17;codec=CodecSpec { key: Dense { dtype: BF16 }, key_width: 512, value: Key, packing: 1 }",
+        "reason": "Canonical",
+        "median_us": 1146.0420325200218,
+        "weight": 117.4139196872907,
+        "weighted_ms": 134.56128716456524
+      },
+      {
+        "unit": "attention_project [NW=bf16,QW=q5k@mma16,GW=q8g32s@mma16,KW=q8g32s@mma16,VW=q8g32s@mma16,A=bf16,M=65..]",
+        "entry": "attention_project",
+        "bindings": "NW=bf16,QW=q5k@mma16,GW=q8g32s@mma16,KW=q8g32s@mma16,VW=q8g32s@mma16,A=bf16,M=65..",
+        "reason": "Expired",
+        "median_us": 1583.6933652304165,
+        "weight": 68.77949483165393,
+        "weighted_ms": 108.92562962879006
+      },
+      {
+        "unit": "kimi_delta_chunk [RN=bf16,A=bf16]",
+        "entry": "kimi_delta_chunk",
+        "bindings": "RN=bf16,A=bf16",
+        "reason": "Canonical",
+        "median_us": 254.81779478305242,
+        "weight": 356.0388268677253,
+        "weighted_ms": 90.72502871957876
+      },
+      {
+        "unit": "routed_gate_up_part [EGW=iq2xxs@mma16,EUW=iq2xxs@mma16,A=bf16,M=4..17]",
+        "entry": "routed_gate_up_part",
+        "bindings": "EGW=iq2xxs@mma16,EUW=iq2xxs@mma16,A=bf16,M=4..17",
+        "reason": "Canonical",
+        "median_us": 545.3977103751304,
+        "weight": 135.9723576379009,
+        "weighted_ms": 74.15901253001951
+      },
+      {
+        "unit": "routed_gate_up [EGW=iq2xxs@mma16,EUW=iq2xxs@mma16,A=bf16,M=4..17]",
+        "entry": "routed_gate_up",
+        "bindings": "EGW=iq2xxs@mma16,EUW=iq2xxs@mma16,A=bf16,M=4..17",
+        "reason": "Canonical",
+        "median_us": 543.1893110200007,
+        "weight": 135.9723576379009,
+        "weighted_ms": 73.85873126309652
+      }
+    ]
+  },
+  "templates": [
+    "repeat:64k"
+  ],
+  "key": "repeat",
+  "path": "/home/outsmartchad/.cache/magnitude-evaluation/runs/20261125T084019Z-bench-6bb9e2/bench",
+  "host": {
+    "hostname": "spark-6154",
+    "alias": "local",
+    "os": "Linux",
+    "os_version": "7.0.0-1025-nvidia",
+    "architecture": "aarch64",
+    "model": "NVIDIA_DGX_Spark",
+    "chip": "Cortex-X925 + Cortex-A725",
+    "cpu_cores_physical": 20,
+    "cpu_cores_logical": 20,
+    "cpus_allowed": 20.0,
+    "memory_bytes": 130661072896,
+    "gpus": [
+      {
+        "name": "NVIDIA GB10",
+        "cores": null,
+        "memory_bytes": null
+      }
+    ],
+    "errors": []
+  }
+}

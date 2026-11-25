@@ -1,0 +1,59 @@
+{
+  "templates": [
+    "repeat:64k"
+  ],
+  "targets": [
+    {
+      "engine": "magnitude",
+      "reference": "/home/outsmartchad/.magnitude/models/hub/models--unsloth--GLM-5.3-Flash-GGUF/snapshots/a38483c8cd5df544f53d70fb281afe97369d5ab6/UD-IQ2_XXS/GLM-5.3-Flash-UD-IQ2_XXS-00001-of-00004.gguf",
+      "sha256": "337870cefce5fb34b2aa3ade54a0fbf61676697f7f9a906670c20edde74561f4"
+    }
+  ],
+  "sections": [
+    "context"
+  ],
+  "engine_options": {
+    "inference": "/home/outsmartchad/.cache/magnitude-evaluation/outputs/d5bb3a407c23d17f-0bd87f38c1ce149e/src",
+    "drafting": true,
+    "vision": false,
+    "magnitude": {
+      "binary": "/home/outsmartchad/.cache/magnitude-evaluation/outputs/d5bb3a407c23d17f-0bd87f38c1ce149e/target/release/magnitude-engine",
+      "build": null,
+      "harness": "/home/outsmartchad/.cache/magnitude-evaluation/outputs/d5bb3a407c23d17f-0bd87f38c1ce149e/target/release/magnitude-render",
+      "device": "cuda",
+      "cache_dir": "/home/outsmartchad/.cache/magnitude-evaluation/runs/20261125T084019Z-bench-6bb9e2/kernels",
+      "prefill_tokens": null,
+      "mtp_proposals": null,
+      "draft_budget": null,
+      "method": null,
+      "alpha": null,
+      "tuning_seconds": null,
+      "fresh_tuning": true,
+      "tuning_trace": true
+    },
+    "llama": {
+      "binary": null,
+      "draft_proposals": 3,
+      "gpu_layers": 99,
+      "cache_type_k": "f16",
+      "cache_type_v": "f16",
+      "context_headroom": 0
+    },
+    "ollama": {
+      "binary": null,
+      "models": null,
+      "kv_cache_type": null,
+      "flash_attention": "auto",
+      "speculation": "off",
+      "context_headroom": 0,
+      "answer_prefill": false
+    },
+    "watchdog": {
+      "stall_seconds": null,
+      "request_seconds": null
+    },
+    "schedule": {
+      "passes": 2
+    }
+  }
+}

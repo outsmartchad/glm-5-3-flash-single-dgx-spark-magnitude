@@ -1,0 +1,18 @@
+{
+  "reference": "/home/outsmartchad/.magnitude/models/hub/models--unsloth--GLM-5.3-Flash-GGUF/snapshots/a38483c8cd5df544f53d70fb281afe97369d5ab6/UD-IQ2_XXS/GLM-5.3-Flash-UD-IQ2_XXS-00001-of-00004.gguf",
+  "path": "/home/outsmartchad/.magnitude/models/hub/models--unsloth--GLM-5.3-Flash-GGUF/snapshots/a38483c8cd5df544f53d70fb281afe97369d5ab6/UD-IQ2_XXS/GLM-5.3-Flash-UD-IQ2_XXS-00001-of-00004.gguf",
+  "kind": "gguf",
+  "context_limit": 1048576,
+  "metadata": {
+    "architecture": "glm5-next",
+    "file_type": 19
+  },
+  "files": [
+    {
+      "path": "GLM-5.3-Flash-UD-IQ2_XXS-00001-of-00004.gguf",
+      "size": 9429984,
+      "sha256": "337870cefce5fb34b2aa3ade54a0fbf61676697f7f9a906670c20edde74561f4",
+      "mtime_ns": 1795578492027510537
+    }
+  ]
+}

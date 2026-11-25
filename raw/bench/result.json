@@ -1,0 +1,183 @@
+{
+  "schema": "evaluation-result/1",
+  "tool": "bench",
+  "started_at": "2026-11-25T08:42:28Z",
+  "finished_at": "2026-11-25T09:00:17Z",
+  "build": {
+    "commit": "78c92e4f21e38f9528f21e09c5e43936a04b6b0d",
+    "dirty_digest": null
+  },
+  "model": "glm-5.3-flash:gguf:iq2",
+  "artifacts": {
+    "drafter": {
+      "method": "mtp",
+      "path": "/home/outsmartchad/.magnitude/models/hub/models--unsloth--GLM-5.3-Flash-GGUF/snapshots/a38483c8cd5df544f53d70fb281afe97369d5ab6/UD-IQ2_XXS/GLM-5.3-Flash-UD-IQ2_XXS-00001-of-00004.gguf",
+      "sha256": "337870cefce5fb34b2aa3ade54a0fbf61676697f7f9a906670c20edde74561f4"
+    },
+    "model": "glm-5.3-flash:gguf:iq2",
+    "projector": {
+      "path": "/home/outsmartchad/.magnitude/models/hub/models--unsloth--GLM-5.3-Flash-GGUF/snapshots/a38483c8cd5df544f53d70fb281afe97369d5ab6/mmproj-BF16.gguf",
+      "sha256": "82b7adb44411dbb298b1c689567804e5ed0790d80f308ed8b5b6b8ac0527d2ac"
+    },
+    "target": "/home/outsmartchad/.magnitude/models/hub/models--unsloth--GLM-5.3-Flash-GGUF/snapshots/a38483c8cd5df544f53d70fb281afe97369d5ab6/UD-IQ2_XXS/GLM-5.3-Flash-UD-IQ2_XXS-00001-of-00004.gguf",
+    "target_files": [
+      "/home/outsmartchad/.magnitude/models/hub/models--unsloth--GLM-5.3-Flash-GGUF/snapshots/a38483c8cd5df544f53d70fb281afe97369d5ab6/UD-IQ2_XXS/GLM-5.3-Flash-UD-IQ2_XXS-00001-of-00004.gguf",
+      "/home/outsmartchad/.magnitude/models/hub/models--unsloth--GLM-5.3-Flash-GGUF/snapshots/a38483c8cd5df544f53d70fb281afe97369d5ab6/UD-IQ2_XXS/GLM-5.3-Flash-UD-IQ2_XXS-00002-of-00004.gguf",
+      "/home/outsmartchad/.magnitude/models/hub/models--unsloth--GLM-5.3-Flash-GGUF/snapshots/a38483c8cd5df544f53d70fb281afe97369d5ab6/UD-IQ2_XXS/GLM-5.3-Flash-UD-IQ2_XXS-00003-of-00004.gguf",
+      "/home/outsmartchad/.magnitude/models/hub/models--unsloth--GLM-5.3-Flash-GGUF/snapshots/a38483c8cd5df544f53d70fb281afe97369d5ab6/UD-IQ2_XXS/GLM-5.3-Flash-UD-IQ2_XXS-00004-of-00004.gguf"
+    ],
+    "target_sha256": "337870cefce5fb34b2aa3ade54a0fbf61676697f7f9a906670c20edde74561f4"
+  },
+  "templates": [
+    {
+      "template": "repeat:64k",
+      "context": 65536,
+      "path": "templates/f67f31e10d8a2109.json",
+      "digest": "f67f31e10d8a2109e35f1546812b6b379c50cc4bae65797323f28da38a2417fb"
+    }
+  ],
+  "rendered_digest": "bfa61c4957dedc2a62757d8ed85e2d9d41f3b34a778674109866c58366ea3964",
+  "host": {
+    "hostname": "spark-6154",
+    "alias": "local",
+    "os": "Linux",
+    "os_version": "7.0.0-1025-nvidia",
+    "architecture": "aarch64",
+    "model": "NVIDIA_DGX_Spark",
+    "chip": "Cortex-X925 + Cortex-A725",
+    "cpu_cores_physical": 20,
+    "cpu_cores_logical": 20,
+    "cpus_allowed": 20.0,
+    "memory_bytes": 130661072896,
+    "gpus": [
+      {
+        "name": "NVIDIA GB10",
+        "cores": null,
+        "memory_bytes": null
+      }
+    ],
+    "errors": []
+  },
+  "command": [
+    "magnitude-bench",
+    "job",
+    "--inference",
+    "/home/outsmartchad/.cache/magnitude-evaluation/outputs/d5bb3a407c23d17f-0bd87f38c1ce149e/src",
+    "--model",
+    "glm-5.3-flash:gguf:iq2",
+    "--passes",
+    "2",
+    "--fresh-tuning",
+    "--magnitude-device",
+    "cuda",
+    "--magnitude-binary",
+    "/home/outsmartchad/.cache/magnitude-evaluation/outputs/d5bb3a407c23d17f-0bd87f38c1ce149e/target/release/magnitude-engine",
+    "--magnitude-cache-dir",
+    "/home/outsmartchad/.cache/magnitude-evaluation/runs/20261125T084019Z-bench-6bb9e2/kernels",
+    "--harness",
+    "/home/outsmartchad/.cache/magnitude-evaluation/outputs/d5bb3a407c23d17f-0bd87f38c1ce149e/target/release/magnitude-render",
+    "--template",
+    "/home/outsmartchad/.cache/magnitude-evaluation/runs/20261125T084019Z-bench-6bb9e2/inputs/f67f31e10d8a2109.json",
+    "--artifacts",
+    "/home/outsmartchad/.cache/magnitude-evaluation/runs/20261125T084019Z-bench-6bb9e2/artifacts.json",
+    "--output",
+    "/home/outsmartchad/.cache/magnitude-evaluation/runs/20261125T084019Z-bench-6bb9e2/bench",
+    "--build-identity",
+    "/home/outsmartchad/.cache/magnitude-evaluation/runs/20261125T084019Z-bench-6bb9e2/bench/build.json"
+  ],
+  "measurements": {
+    "serving": [
+      {
+        "engine": "magnitude",
+        "block": 0,
+        "section": "context",
+        "context": 65536,
+        "concurrency": 1,
+        "session": "context-t65536-c1-0",
+        "template": "repeat:64k",
+        "lane": 0,
+        "prompt_sha256": "174bcc93da31552929848a71822756106a356fe27635450fc0939d32d2f8df2a",
+        "outcome": "valid",
+        "valid": true,
+        "ttft_ms": 100893.2099629892,
+        "completed_ms": 118835.73604898993,
+        "prompt_tokens": 64363,
+        "completion_tokens": 256,
+        "prefill_tps": 639.628063554138,
+        "decode_tps": 14.270814185165284,
+        "draft_n": null,
+        "draft_n_accepted": null,
+        "retrieval": null,
+        "timing_basis": "native-model-service"
+      },
+      {
+        "engine": "magnitude",
+        "block": 1,
+        "section": "context",
+        "context": 65536,
+        "concurrency": 1,
+        "session": "context-t65536-c1-0",
+        "template": "repeat:64k",
+        "lane": 0,
+        "prompt_sha256": "174bcc93da31552929848a71822756106a356fe27635450fc0939d32d2f8df2a",
+        "outcome": "valid",
+        "valid": true,
+        "ttft_ms": 100290.03391298465,
+        "completed_ms": 118806.08631297946,
+        "prompt_tokens": 64363,
+        "completion_tokens": 256,
+        "prefill_tps": 643.4505988050134,
+        "decode_tps": 13.828742351073714,
+        "draft_n": null,
+        "draft_n_accepted": null,
+        "retrieval": null,
+        "timing_basis": "native-model-service"
+      }
+    ],
+    "tuning": {
+      "budget_seconds": 60.0,
+      "fresh": true,
+      "outcome": {
+        "loads": [
+          {
+            "work": "search",
+            "budget_seconds": 60.0,
+            "fresh": true,
+            "concluded_at_seconds": 95.154043909,
+            "overrun_seconds": 0.0,
+            "refused": 89,
+            "units": 130,
+            "searched": 130,
+            "stored": 0,
+            "tuning_seconds": 241.0333641599999,
+            "seconds": 96.045965968
+          },
+          {
+            "work": "load",
+            "budget_seconds": 60.0,
+            "fresh": true,
+            "units": 130,
+            "searched": 0,
+            "stored": 130,
+            "tuning_seconds": 0.322323186,
+            "seconds": 6.8949038510000005
+          },
+          {
+            "work": "load",
+            "budget_seconds": 60.0,
+            "fresh": false,
+            "units": 130,
+            "searched": 0,
+            "stored": 130,
+            "tuning_seconds": 0.425242815,
+            "seconds": 4.185316021
+          }
+        ]
+      }
+    }
+  },
+  "traces": {
+    "tuning": "tuning.jsonl",
+    "thermal": "thermal.jsonl"
+  }
+}

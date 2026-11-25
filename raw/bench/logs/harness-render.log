@@ -1,0 +1,3 @@
+magnitude-harness: run directory /home/outsmartchad/.cache/magnitude-evaluation/runs/20261125T084019Z-bench-6bb9e2/bench/rendered
+magnitude-harness: wrote /home/outsmartchad/.cache/magnitude-evaluation/runs/20261125T084019Z-bench-6bb9e2/bench/rendered/result.json
+magnitude-harness: memory {"moment":"run finished","footprint_bytes":200572928,"malloc_live_bytes":25914240,"graphics_bytes":0,"mapped_bytes":11190272,"rest_bytes":174658688,"peak_footprint_bytes":221102080}

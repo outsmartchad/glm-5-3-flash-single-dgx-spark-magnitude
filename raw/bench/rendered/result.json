@@ -1,0 +1,63 @@
+{
+  "schema": "evaluation-result/1",
+  "tool": "harness.render",
+  "started_at": "2026-11-25T08:42:34Z",
+  "finished_at": "2026-11-25T08:42:40Z",
+  "build": {
+    "commit": "78c92e4f21e38f9528f21e09c5e43936a04b6b0d",
+    "dirty_digest": null
+  },
+  "model": "glm-5.3-flash:gguf:iq2",
+  "artifacts": {
+    "drafter": {
+      "method": "mtp",
+      "path": "/home/outsmartchad/.magnitude/models/hub/models--unsloth--GLM-5.3-Flash-GGUF/snapshots/a38483c8cd5df544f53d70fb281afe97369d5ab6/UD-IQ2_XXS/GLM-5.3-Flash-UD-IQ2_XXS-00001-of-00004.gguf",
+      "sha256": "337870cefce5fb34b2aa3ade54a0fbf61676697f7f9a906670c20edde74561f4"
+    },
+    "model": "glm-5.3-flash:gguf:iq2",
+    "projector": {
+      "path": "/home/outsmartchad/.magnitude/models/hub/models--unsloth--GLM-5.3-Flash-GGUF/snapshots/a38483c8cd5df544f53d70fb281afe97369d5ab6/mmproj-BF16.gguf",
+      "sha256": "82b7adb44411dbb298b1c689567804e5ed0790d80f308ed8b5b6b8ac0527d2ac"
+    },
+    "target": "/home/outsmartchad/.magnitude/models/hub/models--unsloth--GLM-5.3-Flash-GGUF/snapshots/a38483c8cd5df544f53d70fb281afe97369d5ab6/UD-IQ2_XXS/GLM-5.3-Flash-UD-IQ2_XXS-00001-of-00004.gguf",
+    "target_files": [
+      "/home/outsmartchad/.magnitude/models/hub/models--unsloth--GLM-5.3-Flash-GGUF/snapshots/a38483c8cd5df544f53d70fb281afe97369d5ab6/UD-IQ2_XXS/GLM-5.3-Flash-UD-IQ2_XXS-00001-of-00004.gguf",
+      "/home/outsmartchad/.magnitude/models/hub/models--unsloth--GLM-5.3-Flash-GGUF/snapshots/a38483c8cd5df544f53d70fb281afe97369d5ab6/UD-IQ2_XXS/GLM-5.3-Flash-UD-IQ2_XXS-00002-of-00004.gguf",
+      "/home/outsmartchad/.magnitude/models/hub/models--unsloth--GLM-5.3-Flash-GGUF/snapshots/a38483c8cd5df544f53d70fb281afe97369d5ab6/UD-IQ2_XXS/GLM-5.3-Flash-UD-IQ2_XXS-00003-of-00004.gguf",
+      "/home/outsmartchad/.magnitude/models/hub/models--unsloth--GLM-5.3-Flash-GGUF/snapshots/a38483c8cd5df544f53d70fb281afe97369d5ab6/UD-IQ2_XXS/GLM-5.3-Flash-UD-IQ2_XXS-00004-of-00004.gguf"
+    ],
+    "target_sha256": "337870cefce5fb34b2aa3ade54a0fbf61676697f7f9a906670c20edde74561f4"
+  },
+  "templates": [
+    {
+      "template": "repeat:64k",
+      "context": 65536,
+      "path": "/home/outsmartchad/.cache/magnitude-evaluation/runs/20261125T084019Z-bench-6bb9e2/bench/templates/f67f31e10d8a2109.json",
+      "digest": "f67f31e10d8a2109e35f1546812b6b379c50cc4bae65797323f28da38a2417fb"
+    }
+  ],
+  "rendered_digest": "bfa61c4957dedc2a62757d8ed85e2d9d41f3b34a778674109866c58366ea3964",
+  "host": {
+    "hostname": "spark-6154",
+    "os": "linux",
+    "os_version": "7.0.0-1025-nvidia",
+    "chip": null,
+    "cpu_cores": 20,
+    "memory_bytes": 130661072896,
+    "gpus": null
+  },
+  "command": [
+    "/home/outsmartchad/.cache/magnitude-evaluation/outputs/d5bb3a407c23d17f-0bd87f38c1ce149e/target/release/magnitude-render",
+    "render",
+    "--artifacts",
+    "/home/outsmartchad/.cache/magnitude-evaluation/runs/20261125T084019Z-bench-6bb9e2/artifacts.json",
+    "--template",
+    "/home/outsmartchad/.cache/magnitude-evaluation/runs/20261125T084019Z-bench-6bb9e2/bench/templates/f67f31e10d8a2109.json",
+    "--output",
+    "/home/outsmartchad/.cache/magnitude-evaluation/runs/20261125T084019Z-bench-6bb9e2/bench/rendered",
+    "--build-identity",
+    "/home/outsmartchad/.cache/magnitude-evaluation/runs/20261125T084019Z-bench-6bb9e2/bench/build.json"
+  ],
+  "measurements": {},
+  "traces": {}
+}
