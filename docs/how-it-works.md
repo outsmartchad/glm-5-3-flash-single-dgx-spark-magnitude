@@ -1,40 +1,45 @@
-# How GLM 5.3 Flash runs through Magnitude
+# How GLM 5.3 Flash runs on one DGX Spark
 
-This guide explains the model and the measured serving path. It distinguishes sparse model computation from the engine’s method for placing weights in memory.
+This recipe serves Z.ai's GLM 5.3 Flash model using Unsloth's **UD-IQ2_XXS GGUF** and Magnitude's CUDA engine. The model has **321B total parameters** and about **18B active per token**. It fits this single Spark configuration by combining sparse computation, quantized weights and an engine that can place part of the expert bank on disk. [GLM model card](https://huggingface.co/zai-org/GLM-5.3-Flash) · [Magnitude catalog](https://magnitude.dev/benchmarks)
 
-## 1. Sparse mixture of experts
+## 1. What happens to a prompt
 
-Magnitude’s catalog describes GLM 5.3 Flash as **321B total parameters, about 18B active per token, 288 routed experts, and 8 selected experts per token**. The total count is the full parameter inventory. At a routed feed-forward layer, a learned router scores candidate experts and activates only a small top-k set for the current token. The selected expert outputs are combined; shared layers still run for every token.
+The chat template assembles the messages. A tokenizer turns the text into IDs, and an embedding maps each ID to a numerical vector. A sequence of decoder blocks lets each token incorporate earlier information before scoring the next token.
 
-This sparsity reduces compute per token relative to running every expert densely. It does not mean the entire checkpoint fits in GPU memory: this quantized model is about 102 GB on disk, and the runtime must account for shared weights, expert working sets, activations, context state, and operating-system memory.
+**Prefill** processes the whole input and builds the internal state needed for generation. **TTFT** is the time until the client receives its first generated token. **Decode** advances that state and selects subsequent tokens. Large prompts can take much longer to process than a short completion, even when the decode throughput is unchanged.
 
-## 2. The loaded checkpoint and quantization
+## 2. The model's 45 main decoder blocks
 
-This recipe uses the Magnitude catalog entry backed by Unsloth’s **Dynamic IQ2_XXS** GGUF checkpoint. IQ2_XXS is an importance-aware, very-low-bit quantization format; “2-bit” is a format family name, not a promise that every tensor is stored at exactly two bits including metadata. Quantization reduces storage and memory traffic while approximating the original model weights. It can affect output quality; this throughput benchmark did not score quality.
+Each block has a mixer that combines information across tokens and a feed-forward sublayer that transforms each token. The specific published Flash configuration has 45 main blocks, 34 with linear attention and 11 with sparse attention. The first three feed-forward blocks are dense. The remaining blocks route into **8 of 288 routed experts**, with a shared expert also available on the routed blocks. [Z.ai configuration](https://huggingface.co/zai-org/GLM-5.3-Flash/blob/main/config.json)
 
-Magnitude lists an MTP layer embedded in the model file rather than a separate drafter artifact. The measured run’s result data contains no separate draft proposal/acceptance counter. We therefore do not claim an MTP speedup for this run.
+| Component | Role |
+| --- | --- |
+| Kimi Delta Attention | Maintains a recurrent summary of the prefix. Local convolutions and learned decay gates help control what enters and stays in the state. |
+| Sparse multi-head latent attention | Compresses each history entry into a 512-wide latent vector. Attention reads selected latent entries and reconstructs the contributions the heads need. |
+| Pooled history indexer | Scores groups of four prior tokens and selects work for attention up to a 2,048-token budget, with a tail path for recent tokens. |
+| Hyper-connections | Four residual streams carry information between blocks. Learned read and write operations mix the streams around each sublayer. |
+| Mixture of experts | A router scores experts for each token. The chosen networks transform the token and their weighted outputs combine with the shared expert. |
 
-## 3. Token generation
+A recurrent summary gives cheap incremental updates, while the indexed attention blocks can retrieve specific elements of the past. Latent history reduces the context memory per attention token. The model's 18B active count remains an approximation of the weights touched per token. Across a long prompt, different tokens can need most experts in a layer. [Magnitude's GLM family implementation](https://github.com/magnitudedev/magnitude/blob/78c92e4f21e38f9528f21e09c5e43936a04b6b0d/inference/engine/families/glm5next/src/lib.rs)
 
-For each step, the model consumes the prompt or previous tokens and computes the next-token distribution. The router chooses experts at routed layers; attention and the remaining layers update the context representation. A sampler then selects the next token. In this benchmark the sampler is greedy, so the highest-scoring token is selected. Thinking is off, and each valid request ends at 256 generated tokens.
+## 3. Quantized weights and embedded draft layer
 
-The timed workload uses a repeated public-domain text passage to build a prompt around 64K tokens. It measures prompt ingestion (prefill), the time until the first generated token (TTFT), and subsequent token emission (decode). It does not measure normal prose quality, reasoning, coding, tool use, or answer correctness.
+- **GGUF** packages the tensor values and their formats alongside tokenizer and architecture metadata. The catalog package has four target shards at one pinned Unsloth revision.
+- **UD-IQ2_XXS** stores much of the model using a very low bit quantization format. Unsloth's dynamic quantization uses different representations where helpful. The shorthand “2-bit” describes a quant family. Actual file size includes metadata, scales and tensors held at other precisions.
+- **Embedded MTP** adds a trailing prediction block to the main decoder's results. It combines the target's hidden representation with a candidate token embedding to predict a further token. Magnitude asks the target to verify these proposals. Accepted proposals can reduce the number of expensive sequential target steps.
 
-## 4. Magnitude’s memory tiers
+The native run requested MTP and the embedded head reported draft counters in both warmups. The timed passes lacked those counters. The result therefore documents a configured serving profile and achieved throughput, with no measured acceptance rate or isolated MTP gain. [Unsloth quant](https://huggingface.co/unsloth/GLM-5.3-Flash-GGUF) · [Raw timings](../raw/bench/results.jsonl)
 
-Magnitude’s design keeps frequently used shared model data and experts in GPU-accessible memory, places additional experts in system RAM, and streams the rest from NVMe storage. The model’s router determines which experts are needed for a token. The runtime tries to predict upcoming expert usage and stage those weights ahead of use.
+## 4. How a 102 GB checkpoint loads on a 128 GB Spark
 
-On DGX Spark, GB10 shares a unified 128 GB memory pool with the CPU. GPU-oriented allocations and host-side process memory still have different access paths and performance characteristics, but they are not two independent 128 GB pools. SSD-resident experts save memory at the cost of storage reads and staging latency. Expert locality, prefetch accuracy, bandwidth, and competing allocations affect throughput.
+GB10 shares a physical memory pool between CPU and GPU. CUDA allocations, the OS, model pages and other processes all compete for it. The GGUF file size only describes the checkpoint on SSD. During inference, the engine also needs space for active experts, prompt/cache state, temporary activations, draft weights and compute buffers.
 
-This benchmark recorded a process-tree RSS peak of 98.30 GiB. It is not a total machine memory snapshot or a dedicated GPU allocation metric. The near-cap peak is why this recipe keeps to the tested 64K prompt and does not assert safe capacity at 128K.
+Magnitude maintains an **elastic expert bank**. Shared weights and experts that fit stay resident. When the model needs an expert outside that bank, the runtime can fetch and stage its weights. Keeping more in memory can save reads. A larger prompt and its temporary work can make the engine shrink the bank, so a workload that fits at load time can still be tight during inference.
 
-## 5. What the result says
+The successful run sampled **247 to 287 expert slots** out of a 288-slot ceiling and recorded nonzero disk-backed expert weights. Slot counts describe bank capacity. They do not give SSD transfer volume or prove what limited decode throughput. The **98.30 GiB** result is peak sampled process-tree RSS. Linux reported **121.69 GiB** for the whole machine. These figures describe different things. [Allocation samples](../raw/bench/allocations.jsonl) · [RSS footprints](../raw/bench/footprints.jsonl)
 
-The measured median was 14.0 tok/s decode with 641.5 tok/s prefill and 100.59 s TTFT. Magnitude’s published Spark figure is 28 tok/s decode. Our raw result shows the difference under one pinned local run. Fresh tuning left 95.4% of units on canonical fallback, so this result is not a tuned performance ceiling. The benchmark’s Moby Dick repeat workload is not a quality test.
+## 5. Why we chose this launch profile
 
-## Sources
+The official model configuration allows positions up to 1,048,576 tokens. Allocating and serving that many tokens depends on the runtime, quant and available memory. An earlier stock CLI load selected the 1M profile and failed on a local chat request. The native engine and **64,768-token context** in this recipe match the completed run. The server accepts text, with the vision projector disabled to match the test setup.
 
-- [Magnitude benchmark and catalog](https://magnitude.dev/benchmarks)
-- [Magnitude source repository](https://github.com/magnitudedev/magnitude)
-- [Unsloth GLM 5.3 Flash GGUF checkpoint](https://huggingface.co/unsloth/GLM-5.3-Flash-GGUF/tree/main/UD-IQ2_XXS)
-- [GLM-5 technical report](https://arxiv.org/abs/2602.15763)
+`prepare` pins the Magnitude source, acquires the checked catalog artifacts, and stages NVIDIA NVRTC 12.9 for local CUDA kernel compilation. `serve` starts one text server on loopback. The native benchmark owns its own loopback process, uses zero input cache hits and times each of two 256-token completions after ingesting 64,363 tokens. This is a single-request repeat workload. Our published data includes both passes and the record of which kernel decisions fell back to defaults. [Setup](setup.md) · [Timed results and previous failures](results.md) · [Troubleshooting](troubleshooting.md)

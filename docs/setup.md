@@ -1,40 +1,69 @@
-# Install and make a first local request
+# From a clean clone to the first chat reply
 
-## Install
+This recipe builds the Magnitude CUDA engine from the same [source revision](https://github.com/magnitudedev/magnitude/tree/78c92e4f21e38f9528f21e09c5e43936a04b6b0d) as the measured run and downloads the same catalog checkpoint. Its text API uses `127.0.0.1:10100/v1`.
 
-On the DGX Spark, install Magnitude using its [official CLI guide](https://docs.magnitude.dev/). Start the service in the foreground and leave it running:
+## 1. Check the Spark
+
+Use a GB10 DGX Spark running ARM64 Linux with a working NVIDIA driver. Reserve about **145 GB** of SSD space for the model packages, Rust builds and caches. The measured peak process-tree RSS was **98.30 GiB**. Pause other models when you are ready to load this one.
+
+Install Git, curl, Python 3.11+, the standard Ubuntu build tools, [Rust via rustup](https://rustup.rs/) and [uv](https://docs.astral.sh/uv/getting-started/installation/). On Ubuntu, these are the system packages if you need them:
 
 ```bash
-magnitude serve
+sudo apt install git curl python3 build-essential pkg-config libssl-dev iproute2
 ```
 
-The local inference API defaults to `127.0.0.1:10100/inference/v1`. Keep it loopback-only. Do not run `magnitude server setup` for this local recipe.
-
-In another terminal, pull and load the GLM catalog quant:
+The checkout selects its Rust toolchain through `rust-toolchain.toml`. The benchmark harness uses Python 3.12 or newer, which uv can install. Verify that `cargo` and `uv` are on your shell's `PATH`.
 
 ```bash
-magnitude models pull glm-5.3-flash:gguf:iq2
-magnitude models load glm-5.3-flash:gguf:iq2
+git clone https://github.com/outsmartchad/glm-5-3-flash-single-dgx-spark-magnitude.git
+cd glm-5-3-flash-single-dgx-spark-magnitude
+./scripts/recipe.py doctor
 ```
 
-Verify the binding:
+## 2. Prepare the engine and model
 
 ```bash
-ss -ltnp 'sport = :10100'
+./scripts/recipe.py prepare
 ```
 
-It should show `127.0.0.1:10100`, not `0.0.0.0:10100` or a LAN/Tailscale address.
+The first run fetches Magnitude `78c92e4`, verifies NVIDIA's ARM64 SBSA NVRTC 12.9.86 archive, builds the native server and the two benchmark helper binaries, and acquires the catalog package through Magnitude's pinned catalog tool. It checks the acquired target and MTP identities against the run record. It can reuse a previously downloaded package in `~/.magnitude/models`.
 
-## First chat smoke test
+- **Catalog ID**: `glm-5.3-flash:gguf:iq2`
+- **Target snapshot**: [`a38483c`](https://huggingface.co/unsloth/GLM-5.3-Flash-GGUF/tree/a38483c8cd5df544f53d70fb281afe97369d5ab6)
+- **Draft model**: Embedded MTP in the catalog model package
+- **Recipe state**: `~/.cache/magnitude-spark-recipes`. Set `MAGNITUDE_RECIPE_CACHE` to the same absolute directory across commands to store the build elsewhere.
+- **Build tools**: the pinned engine needs NVRTC 12.9 and its matching builtins. The default `prepare` stages both locally. You can also point `SEISMIC_NVRTC_DIRECTORY` at an existing copy.
+
+## 3. Serve and make a local request
 
 ```bash
-curl --fail-with-body http://127.0.0.1:10100/inference/v1/chat/completions \
+./scripts/recipe.py serve
+```
+
+Wait for Magnitude to print its serving URL. The foreground server uses CUDA, a 64,768-token context pool, 256 output tokens of request capacity, MTP, and text input. In a second Spark terminal, from the same checkout:
+
+```bash
+./scripts/recipe.py smoke
+```
+
+The smoke command checks the actual listener and asks `/health` for the expected model, context and draft method. It prints `SPARK_OK` only if the local model returns that text in a chat completion.
+
+Clients can use the catalog ID above and the base URL `http://127.0.0.1:10100/v1`. Example:
+
+```bash
+curl --noproxy '*' --fail-with-body -sS http://127.0.0.1:10100/v1/chat/completions \
   -H 'Content-Type: application/json' \
-  -d '{"model":"glm-5.3-flash:gguf:iq2","messages":[{"role":"user","content":"Reply with exactly SPARK_OK."}],"temperature":0,"max_tokens":32}'
+  -d '{"model":"glm-5.3-flash:gguf:iq2","messages":[{"role":"user","content":"Explain unified memory in two sentences."}],"reasoning_effort":"none","temperature":0,"max_tokens":128}'
 ```
 
-This tests local API reachability only. It is separate from the 64K throughput test and does not assess answer quality.
+For an occupied port, use `serve --port 18907` and `smoke --port 18907`. The same option applies to `status`. To use the API from a different machine via SSH, forward a port to the loopback listener, then point your client at its local forwarded port.
 
-## Stop
+## 4. Reproduce the measured run
 
-Stop the foreground service with `Ctrl-C`. Do not expose the listener on a public interface for this recipe.
+Press Ctrl-C in the server terminal first. The benchmark owns its own temporary local model server.
+
+```bash
+./scripts/benchmark.sh
+```
+
+This runs the upstream native measurement job with the checked-in 64K template. It prices the GPU topology, prepares a fresh tuning cache, and launches two timed passes. Results land under `runs/<run-id>/bench/` and the topology record is beside that directory. Begin on an idle Spark. The original experiment also used the rig's thermal gate. See [results and raw data](results.md) for eligibility and timing formulas. Restart your usual inference service when finished.
