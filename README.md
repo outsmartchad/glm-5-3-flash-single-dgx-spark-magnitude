@@ -2,7 +2,9 @@
 
 Serve **321B total / 18B active** GLM 5.3 Flash on one 128 GB DGX Spark. The recipe uses Magnitude CUDA, Unsloth UD-IQ2_XXS GGUF and the catalog's embedded MTP head. The text API binds to `127.0.0.1`.
 
-![One DGX Spark running GLM 5.3 Flash through Magnitude. 14.27 tok/s single-user decode, 639.6 tok/s 64K cold prefill, 100.89 s TTFT.](assets/glm-5-3-flash-magnitude.png)
+![One DGX Spark running GLM 5.3 Flash through Magnitude. 14.27 tok/s single-user decode, 639.6 tok/s 64K cold prefill, 100.89 s TTFT.](assets/glm53-magnitude-belshazzars-feast.png)
+
+Artwork by John Martin, *Belshazzar’s Feast* (1820). [Source](<https://collections.britishart.yale.edu/catalog/tms:924>)
 
 [Setup and first chat](docs/setup.md) · [How it works](docs/how-it-works.md) · [Benchmark method and raw data](docs/results.md) · [Troubleshooting](docs/troubleshooting.md)
 
